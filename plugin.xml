@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="br.com.zuq.getsignature"
+    version="0.1">
+
+  <name>Signature view plugin</name>
+  <license>ZUQ License</license>
+  <author>Hotaviano Melo</author>
+
+  <!-- Using a relative target is a dirty stinking hack, but it works! -->
+  <asset src="www/signature-view.js" target="js/signature-view.js" />
+
+  <dependency id="org.apache.cordova.device" />
+
+  <platform name="android">
+
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    </config-file>
+
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+      <activity android:screenOrientation="landscape"  android:theme="@android:style/Theme.DeviceDefault" android:name="br.com.zuq.getsignature.MainActivity" />
+    </config-file>
+
+
+
+    <config-file target="res/xml/config.xml" parent="/widget">
+      <feature name="Signature">
+	       <param name="android-package" value="br.com.zuq.getsignature.SignaturePlugin" />
+      </feature>
+    </config-file>
+
+    <js-module src="www/signature-view-native.js" name="Signature" />
+
+    <source-file
+        src="src/android/br/com/zuq/getsignature/MainActivity.java"
+		    target-dir="src/br/com/zuq/getsignature" />
+
+    <source-file
+        src="src/android/br/com/zuq/getsignature/SignaturePlugin.java"
+		    target-dir="src/br/com/zuq/getsignature" />
+
+    <source-file
+        src="src/android/br/com/zuq/getsignature/SignatureView.java"
+		    target-dir="src/br/com/zuq/getsignature" />
+
+    <resource-file
+        src="src/res/layout/activity_main.xml"
+        target="res/layout/activity_main.xml" />
+
+    <resource-file
+        src="src/res/menu/menu_main.xml"
+        target="res/menu/menu_main.xml" />
+
+  </platform>
+</plugin>
