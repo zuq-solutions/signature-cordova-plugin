@@ -1,20 +1,32 @@
 package br.com.zuq.getsignature;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaActivity;
+import org.apache.cordova.PluginResult;
+import org.json.JSONObject;
 
 
 public class MainActivity extends CordovaActivity {
 
-    private SignatureView signatureView;
+    // FIXME: Static Scope
+    private static CallbackContext callback;
 
+    public static void configureCallback(CallbackContext context) {
+        callback = context;
+    }
+
+    private SignatureView signatureView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,44 +38,61 @@ public class MainActivity extends CordovaActivity {
 
         signatureView = new SignatureView(this);
 
-        RelativeLayout place = (RelativeLayout)findViewById(resources.getIdentifier("signature_place", "id", package_name));
+        RelativeLayout place = (RelativeLayout)findViewById(
+                resources.getIdentifier("signature_place", "id", package_name));
         place.addView(signatureView);
+
+        addEventListeners();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        String package_name = getApplication().getPackageName();
-        Resources resources = getApplication().getResources();
-
-        getMenuInflater().inflate(resources.getIdentifier("menu_main", "menu", package_name), menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    private void addEventListeners() {
 
         String package_name = getApplication().getPackageName();
         Resources resources = getApplication().getResources();
 
-        int clean = resources.getIdentifier("action_clean", "id", package_name);
-        int send  = resources.getIdentifier("action_send", "id", package_name);
+        Button cleanButton   = (Button) findViewById(getResource("clean", "id"));
+        Button confirmButton = (Button) findViewById(getResource("confirm", "id"));
+        Button cancelButton  = (Button) findViewById(getResource("cancel", "id"));
 
-        if (id == clean) {
-            signatureView.clear();
-            return true;
-        }
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    JSONObject result = new JSONObject();
+                    result.put("error", 400);
+                    callback.error(result);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    callback.error("Unknown error");
+                }
 
-        else if (id == send) {
-            signatureView.saveImage();
-            signatureView.clear();
-        }
+                finish();
+            }
+        });
 
-        return super.onOptionsItemSelected(item);
+        cleanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signatureView.clear();
+            }
+        });
+
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JSONObject result = signatureView.saveImage();
+                callback.success(result);
+                signatureView.clear();
+                finish();
+            }
+        });
+    }
+
+    private int getResource(String name, String category) {
+      String package_name = getApplication().getPackageName();
+      Resources resources = getApplication().getResources();
+
+      return resources.getIdentifier(name, category, package_name);
     }
 
 }

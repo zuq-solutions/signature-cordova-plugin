@@ -1,11 +1,3 @@
-/**
- * Custom View for capturing the user's signature
- *
- * Code taken from a post by Eric Burke on Square's Engineering Blog:
- * http://corner.squareup.com/2010/07/smooth-signatures.html
- *
- * This falls under Apache License 2.0
- */
 package br.com.zuq.getsignature;
 
 import android.content.Context;
@@ -73,12 +65,12 @@ public class SignatureView extends View {
 	public Bitmap getBitmap() {
 		if (usedRect == null)
 			return null;
-		
+
 		if (!isDrawingCacheEnabled())
 			buildDrawingCache();
-		
+
 		Bitmap bmp = getDrawingCache().copy(Bitmap.Config.ARGB_8888, false);
-		
+
 		if (!isDrawingCacheEnabled())
 			destroyDrawingCache();
 
@@ -138,7 +130,7 @@ public class SignatureView extends View {
 
 			// Augment the used region with the newly dirtied region
 			usedRect.union(dirtyRect);
-			
+
 			// After replaying history, connect the line to the touch point.
 			path.lineTo(eventX, eventY);
 			break;
@@ -153,7 +145,7 @@ public class SignatureView extends View {
 				(int) (dirtyRect.top - HALF_STROKE_WIDTH),
 				(int) (dirtyRect.right + HALF_STROKE_WIDTH),
 				(int) (dirtyRect.bottom + HALF_STROKE_WIDTH));
-    
+
 		lastTouchX = eventX;
 		lastTouchY = eventY;
 
